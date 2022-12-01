@@ -14,7 +14,7 @@ import Deck from "./DeckSchema.js";
 
 app.get("/get-decks", async (req, res) => {
   const result = await Deck.find();
-  res.json(result);
+  res.json(result || []);
 });
 
 app.post("/add-deck", async (req, res) => {
@@ -25,11 +25,17 @@ app.post("/add-deck", async (req, res) => {
   res.json(deck);
 });
 
+app.post("/delete-deck", async (req, res) => {
+  const id = req.body.id;
+  await Deck.findByIdAndDelete(id);
+  res.json({ message: "Deleted" });
+});
+
 app.post("/deck/:deckId", async (req, res) => {
   const deckId = req.params.deckId;
   const deck = await Deck.findById(deckId);
-  deck.cards.push({ name: "Billy" });
-  deck.save();
+  await deck.cards.push({ name: req.body.name });
+  await deck.save();
   res.json(deck);
 });
 
